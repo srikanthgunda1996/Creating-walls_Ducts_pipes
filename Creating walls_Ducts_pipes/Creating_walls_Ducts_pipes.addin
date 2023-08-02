@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>Creating walls_Ducts_pipes - Module02Challenge</Text>
+    <Description>Some description for Creating walls_Ducts_pipes</Description>
+    <Assembly>Creating walls_Ducts_pipes.dll</Assembly>
+    <FullClassName>Creating_walls_Ducts_pipes.ModuleChallenge2</FullClassName>
+    <ClientId>984d56af-7877-40da-ba77-f6e69a06c51d</ClientId>
+    <VendorId>com.YOUR COMPANY NAME</VendorId>
+    <VendorDescription>YOUR COMPANY NAME, YOUR COMPANY URL</VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>Creating walls_Ducts_pipes</Name>
+    <Assembly>Creating walls_Ducts_pipes.dll</Assembly>
+    <FullClassName>Creating_walls_Ducts_pipes.App</FullClassName>
+    <ClientId>0755502d-e5d7-46fd-990e-011c9577e287</ClientId>
+    <VendorId>com.YOUR COMPANY NAME</VendorId>
+    <VendorDescription>YOUR COMPANY NAME, YOUR COMPANY URL</VendorDescription>
+  </AddIn>
+</RevitAddIns>
