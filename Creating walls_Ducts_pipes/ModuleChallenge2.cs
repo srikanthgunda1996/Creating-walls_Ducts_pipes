@@ -18,6 +18,35 @@ namespace Creating_walls_Ducts_pipes
     [Transaction(TransactionMode.Manual)]
     public class ModuleChallenge2 : IExternalCommand
     {
+        internal MEPSystemType getductsystemtype(Document doc, string typeName)
+        {
+            FilteredElementCollector ducttype = new FilteredElementCollector(doc).OfClass(typeof(MEPSystemType));
+            MEPSystemType Ductsystem = null;
+            foreach(MEPSystemType ductsystem in ducttype)
+            {
+                if(ductsystem.Name == typeName)
+                {
+                    Ductsystem = ductsystem;
+                    break;
+                }
+            }
+            return Ductsystem;
+        }
+        internal PipingSystemType getpipesystemtype(Document doc, string typeName)
+        {
+            FilteredElementCollector pipesystemtype = new FilteredElementCollector(doc).OfClass(typeof(PipingSystemType));
+            PipingSystemType PipingSystem = null;
+            foreach (PipingSystemType item in pipesystemtype)
+            {
+                if(item.Name == typeName)
+                {
+                    PipingSystem = item;
+                    break;
+                }
+            }
+            return PipingSystem;
+        }
+
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             // this is a variable for the Revit application
@@ -45,11 +74,30 @@ namespace Creating_walls_Ducts_pipes
             }
             Transaction t = new Transaction(doc);
             t.Start("create walls");
+            string ductsystyp = "";
+            TaskDialog tdg = new TaskDialog("Duct Systems");
+            tdg.MainInstruction = "Select Duct System:";
+            tdg.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Return Air");
+            tdg.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Exhaust Air");
+            tdg.AddCommandLink(TaskDialogCommandLinkId.CommandLink3, "Supply Air");
+            TaskDialogResult selectedsystem = tdg.Show();
+            if(selectedsystem == TaskDialogResult.CommandLink1)
+            {
+                ductsystyp = "Return Air";
+            }
+            if (selectedsystem == TaskDialogResult.CommandLink2)
+            {
+                ductsystyp = "Exhaust Air";
+            }
+            if (selectedsystem == TaskDialogResult.CommandLink3)
+            {
+                ductsystyp = "Supply Air";
+            }
             FilteredElementCollector ducttype = new FilteredElementCollector(doc).OfClass(typeof (DuctType));
             FilteredElementCollector walltype = new FilteredElementCollector(doc).OfClass(typeof(WallType));
             FilteredElementCollector pipetype = new FilteredElementCollector(doc).OfClass(typeof(PipeType));
-            FilteredElementCollector ductsystemtype = new FilteredElementCollector(doc).OfClass(typeof(MEPSystemType));
-            FilteredElementCollector pipesystemtype = new FilteredElementCollector(doc).OfClass(typeof(PipingSystemType));
+            MEPSystemType ductsystemtype = getductsystemtype(doc, ductsystyp);
+            PipingSystemType pipesystemtype = getpipesystemtype(doc, "Domestic Cold Water");
             WallType storefrontwall = null;
             WallType genwall = null;
            foreach(WallType genwall1 in walltype)
@@ -77,22 +125,38 @@ namespace Creating_walls_Ducts_pipes
                     GraphicsStyle curgra = element.LineStyle as GraphicsStyle;
                     XYZ startpoint = modelcurve.GetEndPoint(0);
                     XYZ endpoint = modelcurve.GetEndPoint(1);
+                    
 
-                    if (curgra.Name == "A-GLAZ")
+                    //if (curgra.Name == "A-GLAZ")
+                    //{
+                    //    Wall.Create(doc, modelcurve, storefrontwall.Id, lev.FirstElementId(), 20, 0, false, false);
+                    //}
+                    //if (curgra.Name == "A-WALL")
+                    //{
+                    //    Wall.Create(doc, modelcurve, genwall.Id, lev.FirstElementId(), 20, 0, false, false);
+                    //}
+                    //if (curgra.Name == "M-DUCT")
+                    //{
+                    //    Duct.Create(doc, ductsystemtype.Id, ducttype.FirstElementId(), lev.FirstElementId(), startpoint, endpoint);
+                    //}
+                    //if (curgra.Name == "P-PIPE")
+                    //{
+                    //    Pipe.Create(doc, pipesystemtype.Id, pipetype.FirstElementId(), lev.FirstElementId(), startpoint, endpoint);
+                    //}
+                    switch (curgra.Name)
                     {
-                        Wall.Create(doc, modelcurve, storefrontwall.Id, lev.FirstElementId(), 20, 0, false, false);
-                    }
-                    if (curgra.Name == "A-WALL")
-                    {
-                        Wall.Create(doc, modelcurve, genwall.Id, lev.FirstElementId(), 20, 0, false, false);
-                    }
-                    if (curgra.Name == "M-DUCT")
-                    {
-                        Duct.Create(doc, ductsystemtype.FirstElementId(), ducttype.FirstElementId(), lev.FirstElementId(), startpoint, endpoint);
-                    }
-                    if (curgra.Name == "P-PIPE")
-                    {
-                        Pipe.Create(doc, pipesystemtype.FirstElementId(), pipetype.FirstElementId(), lev.FirstElementId(), startpoint, endpoint);
+                        case "A-GLAZ":
+                            Wall.Create(doc, modelcurve, storefrontwall.Id, lev.FirstElementId(), 20, 0, false, false);
+                            break;
+                        case "A-WALL":
+                            Wall.Create(doc, modelcurve, genwall.Id, lev.FirstElementId(), 20, 0, false, false);
+                            break;
+                        case "M-DUCT":
+                            Duct.Create(doc, ductsystemtype.Id, ducttype.FirstElementId(), lev.FirstElementId(), startpoint, endpoint);
+                            break;
+                        case "P-PIPE":
+                            Pipe.Create(doc, pipesystemtype.Id, pipetype.FirstElementId(), lev.FirstElementId(), startpoint, endpoint);
+                            break;
                     }
 
                 }
